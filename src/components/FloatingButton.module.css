@@ -1,0 +1,97 @@
+.floatingContainer {
+    position: fixed;
+    width: 100px;
+    height: 100px;
+    bottom: 0;
+    right: 0;
+    margin: 35px 25px;
+    transition: height 0.3s;
+}
+
+.floatingContainer:hover {
+    height: 340px;
+}
+
+.floatingButton {
+    position: absolute;
+    width: 65px;
+    height: 65px;
+    background: #97BDFA;
+    bottom: 0;
+    border-radius: 50%;
+    left: 0;
+    right: 0;
+    margin: auto;
+    color: white;
+    line-height: 65px;
+    text-align: center;
+    font-size: 23px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.elementContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.floatElementWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: -5px; /* ลดระยะห่างด้านล่าง */
+    opacity: 0;
+    transform: translateY(-5px); /* ขยับขึ้นเล็กน้อย */
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.showElements .wrapper1 {
+    opacity: 1;
+    transform: translateY(-45px); /* ขยับขึ้นไปอีก */
+    transition-delay: 0.1s;
+}
+
+.showElements .wrapper2 {
+    opacity: 1;
+    transform: translateY(-30px); /* ขยับขึ้นไปอีก */
+    transition-delay: 0.2s;
+}
+
+.showElements .wrapper3 {
+    opacity: 1;
+    transform: translateY(-15px); /* ขยับขึ้นไปอีก */
+    transition-delay: 0.3s;
+}
+
+
+.floatElement {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 70px; /* ขยายขนาดวงกลมถ้าต้องการ */
+    height: 70px;
+    font-size: 40px; /* ขนาดอิโมจิ */
+    color: white;
+    font-weight: 500;
+}
+
+.element1 {
+    background: #F8D17F;
+}
+
+.element2 {
+    background: #F2A459;
+}
+
+.element3 {
+    background: #AECE7B;
+}
+
+.floatElementText {
+    font-size: 13px;
+    color: #333;
+    margin-top: 10px;
+    text-align: center;
+}

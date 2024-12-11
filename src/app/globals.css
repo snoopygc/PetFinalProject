@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #C9A188;
+  --color-secondary: #AECE7B;
+  --color-accent: #97BDFA;
+  --color-highlight: #F8D17F;
+  --color-warning: #F2A459;
+  --color-background: #FFFFFF;
+  --color-text: #333333;
+}
+
+body {
+  @apply text-text bg-background;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold text-primary;
+}
+
+a {
+  @apply text-accent hover:text-secondary;
+}
+

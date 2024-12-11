@@ -1,0 +1,32 @@
+.marqueeContainer {
+  width: 100%;
+  overflow: hidden;
+  background-color: #f0f4f8;
+}
+
+.marqueeWrapper {
+  display: flex;
+  animation: scroll 20s linear infinite;
+}
+
+.marqueeWrapper:hover {
+  animation-play-state: paused;
+}
+
+.marqueeItem {
+  flex-shrink: 0;
+  padding: 1rem;
+  font-family: "Arial", sans-serif;
+  font-size: 1.2rem;
+  white-space: nowrap;
+  color: #333;
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
