@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Emoji Tic-Tac-Toe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Slackey&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Slackey', sans-serif;
+            background-color: #E9C874;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .game-container {
+            text-align: center;
+            background: #FBF8DD;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 700px;
+        }
+
+        h1 {
+            color: #800000;
+            font-size: 2rem;
+            font-family: 'Slackey', sans-serif;
+        }
+
+        .player-input {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input {
+            padding: 5px 10px;
+            border: 1px solid #800000;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Slackey', sans-serif;
+            margin-bottom: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: #800000;
+            color: white;
+            font-size: 1rem;
+            font-family: 'Slackey', sans-serif;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #DC6B19;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #FFFAF0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            border: 2px solid #FFB6C1;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 10px;
+        }
+
+        .cell:hover {
+            background-color: #FFE4E1;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            background: #DC6B19;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #FFF2D7;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .alert-box h2 {
+            color: #DC6B19;
+        }
+
+        .alert-box button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🐾 Dog XOXO 🐾</h1>
+        <div class="player-input">
+            <input type="text" id="player1-name" placeholder="Player 1 Name 🦮">
+            <input type="text" id="player2-name" placeholder="Player 2 Name 🐩">
+            <div class="button-container">
+                <button id="start-game">Start Game</button>
+                <button id="play-bot">Play Against Bot</button>
+            </div>
+        </div>
+        <div id="scoreboard" class="scoreboard" style="display: none;">
+            <div class="player">
+                <h2 id="player1-display"></h2>
+                <p id="score1">Score: 0</p>
+            </div>
+            <div class="player">
+                <h2 id="player2-display"></h2>
+                <p id="score2">Score: 0</p>
+            </div>
+        </div>
+        <div id="game-board" class="board" style="display: none;"></div>
+    </div>
+    <div class="alert-box" id="custom-alert">
+        <h2 id="alert-message"></h2>
+        <button id="alert-ok">OK</button>
+    </div>
+
+    <script>
+        const board = document.getElementById('game-board');
+        const scoreboard = document.getElementById('scoreboard');
+        const score1 = document.getElementById('score1');
+        const score2 = document.getElementById('score2');
+        const alertBox = document.getElementById('custom-alert');
+        const alertMessage = document.getElementById('alert-message');
+        const alertOk = document.getElementById('alert-ok');
+        const player1NameInput = document.getElementById('player1-name');
+        const player2NameInput = document.getElementById('player2-name');
+        const player1Display = document.getElementById('player1-display');
+        const player2Display = document.getElementById('player2-display');
+        const startButton = document.getElementById('start-game');
+        const playBotButton = document.getElementById('play-bot');
+
+        let currentPlayer = '🦮';
+        let player1Name = 'Player 1';
+        let player2Name = 'Player 2';
+        let playerScores = { '🦮': 0, '🐩': 0 };
+        let draws = 0;
+        let gameState = Array(9).fill(null);
+        let isBot = false;
+
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6],
+        ];
+
+        function initializeGame() {
+            board.innerHTML = '';
+            gameState = Array(9).fill(null);
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', handleMove, { once: true });
+                board.appendChild(cell);
+            }
+        }
+
+        function handleMove(event) {
+            const index = event.target.dataset.index;
+            if (!gameState[index]) {
+                gameState[index] = currentPlayer;
+                event.target.textContent = currentPlayer;
+                if (checkWin()) {
+                    playerScores[currentPlayer]++;
+                    updateScores();
+                    checkGameEnd(`${currentPlayer === '🦮' ? player1Name : player2Name} wins! 🎉`);
+                } else if (gameState.every(cell => cell !== null)) {
+                    draws++;
+                    checkGameEnd("It's a draw! 🐾");
+                } else {
+                    currentPlayer = currentPlayer === '🦮' ? '🐩' : '🦮';
+                    if (isBot && currentPlayer === '🐩') botMove();
+                }
+            }
+        }
+
+        function botMove() {
+            const emptyCells = gameState.map((value, index) => value === null ? index : null).filter(v => v !== null);
+            const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            const botCell = board.querySelector(`.cell[data-index="${randomIndex}"]`);
+            botCell.click();
+        }
+
+        function checkWin() {
+            return winningCombinations.some(combination =>
+                combination.every(index => gameState[index] === currentPlayer)
+            );
+        }
+
+        function checkGameEnd(message) {
+            if (playerScores['🦮'] >= 10 || playerScores['🐩'] >= 10) {
+                showAlert(`${message} 🏆`);
+            } else if (draws >= 10) {
+                if (playerScores['🦮'] > playerScores['🐩']) {
+                    showAlert(`${player1Name} wins with the highest score! 🏆`);
+                } else if (playerScores['🐩'] > playerScores['🦮']) {
+                    showAlert(`${player2Name} wins with the highest score! 🏆`);
+                } else {
+                    showAlert("Error: Both players have the same score! Restarting the game...");
+                }
+                resetGame();
+            } else {
+                showAlert(message);
+                initializeGame();
+            }
+        }
+
+        function updateScores() {
+            score1.textContent = `Score: ${playerScores['🦮']}`;
+            score2.textContent = `Score: ${playerScores['🐩']}`;
+        }
+
+        function showAlert(message) {
+            alertMessage.textContent = message;
+            alertBox.style.display = 'block';
+        }
+
+        alertOk.addEventListener('click', () => {
+            alertBox.style.display = 'none';
+            if (playerScores['🦮'] >= 10 || playerScores['🐩'] >= 10) {
+                resetGame();
+            }
+        });
+
+        startButton.addEventListener('click', () => {
+            player1Name = player1NameInput.value || 'Player 1';
+            player2Name = player2NameInput.value || 'Player 2';
+            player1Display.textContent = `${player1Name} 🦮`;
+            player2Display.textContent = `${player2Name} 🐩`;
+            isBot = false;
+            startGame();
+        });
+
+        playBotButton.addEventListener('click', () => {
+            player1Name = player1NameInput.value || 'Player';
+            player2Name = 'Bot';
+            player1Display.textContent = `${player1Name} 🦮`;
+            player2Display.textContent = `${player2Name} 🐩`;
+            isBot = true;
+            startGame();
+        });
+
+        function startGame() {
+            scoreboard.style.display = 'flex';
+            board.style.display = 'grid';
+            playerScores = { '🦮': 0, '🐩': 0 };
+            draws = 0;
+            updateScores();
+            initializeGame();
+        }
+
+        function resetGame() {
+            playerScores = { '🦮': 0, '🐩': 0 };
+            draws = 0;
+            updateScores();
+            player1NameInput.value = '';
+            player2NameInput.value = '';
+            scoreboard.style.display = 'none';
+            board.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

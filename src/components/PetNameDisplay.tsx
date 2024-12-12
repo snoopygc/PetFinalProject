@@ -147,3 +147,4 @@ export default function PetNameDisplay({ name }: { name: string }) {
         </div>
     )
 }
+

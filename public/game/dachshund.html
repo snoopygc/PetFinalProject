@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dachshund Snake</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Slackey&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #763e06;
+            font-family: 'Slackey', cursive;
+            overflow: hidden;
+        }
+
+        .name-entry {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .game-title {
+            font-family: 'Slackey', cursive;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .name-input {
+            font-family: 'Slackey', cursive;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .start-btn {
+            font-family: 'Slackey', cursive;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .start-btn:hover {
+            background-color: #45a049;
+        }
+
+        .game-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            background-color: #c5e3f6;
+            border: 5px solid #d4a373;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .dog {
+            width: 20px;
+            height: 20px;
+            background-color: #d4a373;
+            border-radius: 5px;
+            position: absolute;
+        }
+
+        .bone {
+            width: 20px;
+            height: 20px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+
+    <!-- SweetAlert2 CSS and JavaScript -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.8/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.8/dist/sweetalert2.min.js"></script>
+</head>
+
+<body>
+    <div class="name-entry">
+        <h1 class="game-title">Dachshund Snake</h1>
+        <input type="text" id="playerName" class="name-input" placeholder="Enter Your Name" maxlength="15">
+        <button id="startButton" class="start-btn">Start Game</button>
+    </div>
+
+    <div class="game-container">
+        <div class="score">Score: 0</div>
+    </div>
+
+    <script>
+        const nameEntrySection = document.querySelector('.name-entry');
+        const gameContainer = document.querySelector('.game-container');
+        const playerNameInput = document.getElementById('playerName');
+        const startButton = document.getElementById('startButton');
+        const scoreDisplay = document.querySelector('.score');
+
+        startButton.addEventListener('click', () => {
+            const playerName = playerNameInput.value.trim();
+            
+            if (playerName) {
+                nameEntrySection.style.display = 'none';
+                gameContainer.style.display = 'flex';
+                startGame();
+            } else {
+                Swal.fire({
+                    title: 'Oops!',
+                    text: 'Please enter your name',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                });
+            }
+        });
+
+        function startGame() {
+            const gameContainer = document.querySelector('.game-container');
+            const scoreDisplay = document.querySelector('.score');
+            let score = 0;
+            let dog = [{ x: 200, y: 200 }];
+            let bone = { x: Math.floor(Math.random() * 20) * 20, y: Math.floor(Math.random() * 20) * 20 };
+            let direction = { x: 20, y: 0 };
+            let gameOver = false;
+            let gameWon = false;
+
+            function createDogElement(x, y) {
+                const dogElement = document.createElement('div');
+                dogElement.style.left = `${x}px`;
+                dogElement.style.top = `${y}px`;
+                dogElement.classList.add('dog');
+                gameContainer.appendChild(dogElement);
+            }
+
+            function createBoneElement() {
+                const boneElement = document.createElement('div');
+                boneElement.style.left = `${bone.x}px`;
+                boneElement.style.top = `${bone.y}px`;
+                boneElement.classList.add('bone');
+                gameContainer.appendChild(boneElement);
+            }
+
+            function handleGameOver() {
+                if (gameOver) return;
+                gameOver = true;
+
+                Swal.fire({
+                    title: 'Oh no!',
+                    text: 'The Dachshund hit the wall !',
+                    icon: 'error',
+                    confirmButtonText: 'Try Again !',
+                    background: '#f3f4ed',
+                    iconColor: '#ff6666',
+                    confirmButtonColor: '#f7c26e',
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+
+            function handleWin() {
+                if (gameWon) return;
+                gameWon = true;
+
+                Swal.fire({
+                    title: '🎉 Yay! 🎉',
+                    text: 'The Dachshund is full and happy! ur score = 100 points!',
+                    icon: 'success',
+                    confirmButtonText: 'Play Again ?',
+                    background: '#f3f4ed',
+                    iconColor: '#58c6e7',
+                    confirmButtonColor: '#f7c26e',
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+
+            function updateGame() {
+                if (gameOver || gameWon) return;
+
+                const head = { x: dog[0].x + direction.x, y: dog[0].y + direction.y };
+                dog.unshift(head);
+
+                if (head.x === bone.x && head.y === bone.y) {
+                    score += 10;
+                    scoreDisplay.innerText = `Score: ${score}`;
+                    bone = {
+                        x: Math.floor(Math.random() * 20) * 20,
+                        y: Math.floor(Math.random() * 20) * 20
+                    };
+                    createBoneElement();
+                } else {
+                    dog.pop();
+                }
+
+                if (
+                    head.x < 0 || head.x >= 400 ||
+                    head.y < 0 || head.y >= 400 ||
+                    dog.slice(1).some(part => part.x === head.x && part.y === head.y)
+                ) {
+                    handleGameOver();
+                }
+
+                if (score === 100) {
+                    handleWin();
+                }
+
+                render();
+            }
+
+            function render() {
+                gameContainer.innerHTML = `<div class="score">Score: ${score}</div>`;
+                dog.forEach(segment => createDogElement(segment.x, segment.y));
+                createBoneElement();
+            }
+
+            function changeDirection(event) {
+                switch (event.key) {
+                    case 'ArrowUp':
+                        if (direction.y === 0) direction = { x: 0, y: -20 };
+                        break;
+                    case 'ArrowDown':
+                        if (direction.y === 0) direction = { x: 0, y: 20 };
+                        break;
+                    case 'ArrowLeft':
+                        if (direction.x === 0) direction = { x: -20, y: 0 };
+                        break;
+                    case 'ArrowRight':
+                        if (direction.x === 0) direction = { x: 20, y: 0 };
+                        break;
+                }
+            }
+
+            document.addEventListener('keydown', changeDirection);
+            setInterval(updateGame, 150);
+        }
+    </script>
+</body>
+
+</html>

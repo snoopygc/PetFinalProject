@@ -9,7 +9,7 @@
 }
 
 .floatingContainer:hover {
-    height: 340px;
+    height: 420px; /* Increased height to accommodate the new button */
 }
 
 .floatingButton {
@@ -40,41 +40,50 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: -5px; /* ลดระยะห่างด้านล่าง */
+    margin-bottom: -5px;
     opacity: 0;
-    transform: translateY(-5px); /* ขยับขึ้นเล็กน้อย */
+    transform: translateY(-5px);
     transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.showElements .wrapper0 {
+    opacity: 1;
+    transform: translateY(-60px);
+    transition-delay: 0.1s;
 }
 
 .showElements .wrapper1 {
     opacity: 1;
-    transform: translateY(-45px); /* ขยับขึ้นไปอีก */
-    transition-delay: 0.1s;
+    transform: translateY(-45px);
+    transition-delay: 0.2s;
 }
 
 .showElements .wrapper2 {
     opacity: 1;
-    transform: translateY(-30px); /* ขยับขึ้นไปอีก */
-    transition-delay: 0.2s;
+    transform: translateY(-30px);
+    transition-delay: 0.3s;
 }
 
 .showElements .wrapper3 {
     opacity: 1;
-    transform: translateY(-15px); /* ขยับขึ้นไปอีก */
-    transition-delay: 0.3s;
+    transform: translateY(-15px);
+    transition-delay: 0.4s;
 }
-
 
 .floatElement {
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    width: 70px; /* ขยายขนาดวงกลมถ้าต้องการ */
+    width: 70px;
     height: 70px;
-    font-size: 40px; /* ขนาดอิโมจิ */
+    font-size: 40px;
     color: white;
     font-weight: 500;
+}
+
+.element0 {
+    background: #97BDFA;
 }
 
 .element1 {
@@ -95,3 +104,4 @@
     margin-top: 10px;
     text-align: center;
 }
+

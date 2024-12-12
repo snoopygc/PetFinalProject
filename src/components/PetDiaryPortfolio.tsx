@@ -96,19 +96,19 @@ const PetDiaryPortfolio: React.FC = () => {
             </div>
 
             <style jsx>{`
-        @media (max-width: 1080px) {
-          main {
-            grid-template-columns: repeat(5, 1fr);
-          }
-        }
+            @media (max-width: 1080px) {
+                main {
+                    grid-template-columns: repeat(5, 1fr);
+                }
+                }
 
-        @media (max-width: 880px) {
-          main {
-            display: flex;
-            flex-direction: column;
-          }
-        }
-      `}</style>
+                @media (max-width: 880px) {
+                main {
+                    display: flex;
+                    flex-direction: column;
+                }
+                }
+            `}</style>
         </main>
     );
 };

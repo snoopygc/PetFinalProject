@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Speed Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Slackey&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Slackey', cursive;
+            background-color: #81BFDA;
+            color: #2d6a4f;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        .container {
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .container h1 {
+            font-size: 2.5rem;
+            color: #ff9e00;
+            margin-bottom: 10px;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-section label {
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .input-section input {
+            font-family: 'Slackey', cursive;
+            font-size: 1rem;
+            padding: 10px;
+            width: calc(100% - 20px);
+            text-align: center;
+            margin-bottom: 15px;
+            border: 2px solid #ffcb77;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+
+        .input-section button {
+            font-family: 'Slackey', cursive;
+            background-color: #ffd60a;
+            color: #6a4c93;
+            border: none;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .input-section button:hover {
+            background-color: #ff9e00;
+            color: white;
+        }
+
+        #gameArea {
+            display: none;
+        }
+
+        #wordToType {
+            font-size: 1.5rem;
+            color: #1b4332;
+            margin-bottom: 15px;
+        }
+
+        #timer {
+            font-size: 1.2rem;
+            color: #e63946;
+            margin-top: 10px;
+        }
+
+        /* Custom Alert Styling */
+        .alert-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .alert-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .alert-content h2 {
+            color: #2d6a4f;
+            margin: 0;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .alert-content p {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .alert-content button {
+            font-family: 'Slackey', cursive;
+            background: #ffd60a;
+            color: #6a4c93;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .alert-content button:hover {
+            background: #ff9e00;
+            color: #fff;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <!-- Container 1: Name Input Section -->
+        <div class="container">
+            <h1>🐾 Typing Speed Test 🐾</h1>
+            <div class="input-section">
+                <label for="playerName">Enter your name:</label>
+                <input type="text" id="playerName" placeholder="Your Name" />
+                <button id="startGame">Start Game</button>
+            </div>
+        </div>
+
+        <!-- Container 2: Typing Speed Game -->
+        <div class="container" id="gameArea">
+            <p id="wordToType">Click Start to Begin!</p>
+            <div class="input-section">
+                <input type="text" id="typingInput" placeholder="Type here..." disabled />
+            </div>
+            <p id="timer">Time: 0.00s</p>
+        </div>
+
+        <!-- Custom Alert Modal -->
+        <div class="alert-modal" id="alertModal">
+            <div class="alert-content">
+                <h2>Game Over!</h2>
+                <p id="alertMessage"></p>
+                <button id="closeAlert">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const breeds = ["Beagle", "Bulldog", "Golden Retriever", "Poodle", "Shih Tzu", "Husky", "Dachshund"];
+        const playerNameInput = document.getElementById("playerName");
+        const startButton = document.getElementById("startGame");
+        const gameArea = document.getElementById("gameArea");
+        const wordToType = document.getElementById("wordToType");
+        const typingInput = document.getElementById("typingInput");
+        const timerDisplay = document.getElementById("timer");
+
+        let timer = 0;
+        let timerInterval;
+        let currentWord;
+        let score;
+
+        startButton.addEventListener("click", () => {
+            const playerName = playerNameInput.value.trim();
+            if (playerName === "") {
+                alert("Please enter your name to start!");
+                return;
+            }
+            startGame(playerName);
+        });
+
+        function startGame(playerName) {
+            playerNameInput.disabled = true;
+            startButton.disabled = true;
+            gameArea.style.display = 'block';
+            typingInput.disabled = false;
+            typingInput.focus();
+            score = 0;
+            timer = 0;
+            nextWord();
+            startTimer();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timer += 0.01;
+                timerDisplay.textContent = `Time: ${timer.toFixed(2)}s`;
+            }, 10);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function nextWord() {
+            currentWord = breeds[Math.floor(Math.random() * breeds.length)];
+            wordToType.textContent = currentWord;
+            typingInput.value = "";
+        }
+
+        typingInput.addEventListener("input", () => {
+            if (typingInput.value.trim() === currentWord) {
+                score += Math.max(10 - timer, 1); // Faster typing = higher score
+                nextWord();
+            }
+        });
+
+        function endGame(playerName) {
+            stopTimer();
+            typingInput.disabled = true;
+            showCustomAlert(`${playerName}, your final score is: ${score.toFixed(2)}`);
+        }
+
+        function showCustomAlert(message) {
+            const alertModal = document.getElementById("alertModal");
+            const alertMessage = document.getElementById("alertMessage");
+            const closeAlert = document.getElementById("closeAlert");
+
+            alertMessage.textContent = message;
+            alertModal.style.display = "flex";
+
+            closeAlert.onclick = () => {
+                alertModal.style.display = "none";
+                resetGame();
+            };
+        }
+
+        function resetGame() {
+            playerNameInput.disabled = false;
+            startButton.disabled = false;
+            playerNameInput.value = "";
+            wordToType.textContent = "Click Start to Begin!";
+            typingInput.value = "";
+            timerDisplay.textContent = "Time: 0.00s";
+            gameArea.style.display = 'none';
+            typingInput.disabled = true;
+        }
+
+        setInterval(() => {
+            if (gameArea.style.display === 'none') return;
+            if (timer >= 30) endGame(playerNameInput.value);
+        }, 100);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whack-a-Dog Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Slackey&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8e8c8;
+            font-family: 'Slackey', cursive;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 80vw;
+            max-width: 600px;
+            justify-items: center;
+            background-color: #d2a27d;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .hole {
+            width: 100px;
+            height: 100px;
+            background-color: #855e42;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            font-size: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .score-board {
+            font-size: 24px;
+            font-family: 'Slackey', cursive;
+            color: #4b2f2a;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .start-button {
+            background-color: #c77a56;
+            color: white;
+            font-size: 18px;
+            font-family: 'Slackey', cursive;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .start-button:hover {
+            background-color: #9d5d42;
+        }
+
+        .input-section-container {
+            margin-bottom: 20px;
+            text-align: center;
+            background-color: #f4e3d3;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-header {
+            font-family: 'Slackey', cursive;
+            font-size: 28px;
+            color: #4b2f2a;
+            margin-bottom: 10px;
+        }
+
+        .input-section label {
+            font-family: 'Slackey', cursive;
+            font-size: 20px;
+        }
+
+        .input-section input {
+            padding: 10px;
+            font-size: 16px;
+            font-family: 'Slackey', cursive;
+            text-align: center;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .game-over {
+            font-size: 28px;
+            font-family: 'Slackey', cursive;
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .missed {
+            font-size: 30px;
+            font-family: 'Slackey', cursive;
+            color: red;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="input-section-container">
+        <div class="game-header">Whack-a-Dog Game</div>
+        <div class="input-section">
+            <label for="playerName">Enter your name: </label>
+            <input type="text" id="playerName" placeholder="Your Name">
+            <button class="start-button" id="startButton">Start Game</button>
+        </div>
+    </div>
+
+    <div class="score-board">
+        <p>Score: <span id="score">0</span></p>
+        <p>Misses: <span id="misses">0</span></p>
+    </div>
+
+    <div id="missedEmojis" class="missed"></div>
+
+    <div class="game-container">
+        <div class="hole" id="hole1"></div>
+        <div class="hole" id="hole2"></div>
+        <div class="hole" id="hole3"></div>
+        <div class="hole" id="hole4"></div>
+        <div class="hole" id="hole5"></div>
+        <div class="hole" id="hole6"></div>
+        <div class="hole" id="hole7"></div>
+        <div class="hole" id="hole8"></div>
+        <div class="hole" id="hole9"></div>
+    </div>
+
+    <div id="gameOver" class="game-over" style="display: none;">Game Over! You missed 3 times.</div>
+
+    <script>
+        const holes = document.querySelectorAll('.hole');
+        const scoreDisplay = document.getElementById('score');
+        const missesDisplay = document.getElementById('misses');
+        const missedEmojisDisplay = document.getElementById('missedEmojis');
+        const startButton = document.getElementById('startButton');
+        const playerNameInput = document.getElementById('playerName');
+        const gameOverMessage = document.getElementById('gameOver');
+        let score = 0;
+        let misses = 0;
+        let gameActive = false;
+        let dogSpeed = 1500;
+        let playerName = '';
+        let missedEmojis = [];
+
+        const dogEmojis = ['🦮', '🐩', '🐕‍🦺'];
+
+        function startGame() {
+            playerName = playerNameInput.value.trim();
+            if (playerName === '') {
+                alert('Please enter your name to start!');
+                return;
+            }
+
+            score = 0;
+            misses = 0;
+            missedEmojis = [];
+            scoreDisplay.textContent = score;
+            missesDisplay.textContent = misses;
+            missedEmojisDisplay.innerHTML = '';
+            gameActive = true;
+            startButton.textContent = "Game Running";
+            startButton.disabled = true;
+            showDog();
+            gameOverMessage.style.display = 'none';
+        }
+
+        function showDog() {
+            if (!gameActive) return;
+
+            const randomHoleIndex = Math.floor(Math.random() * holes.length);
+            const randomHole = holes[randomHoleIndex];
+            const dogEmoji = dogEmojis[Math.floor(Math.random() * dogEmojis.length)];
+            randomHole.textContent = dogEmoji;
+
+            setTimeout(() => {
+                if (!gameActive) return;
+                if (randomHole.textContent === dogEmoji) {
+                    misses++;
+                    missesDisplay.textContent = misses;
+                    missedEmojis.push(dogEmoji);
+                    updateMissedEmojis();
+                    randomHole.textContent = '';
+                    if (misses > 2) {
+                        endGame();
+                        return;
+                    }
+                }
+            }, dogSpeed);
+
+            if (score > 10) {
+                dogSpeed = 1000;
+            }
+
+            if (gameActive) {
+                setTimeout(showDog, dogSpeed);
+            }
+        }
+
+        function updateMissedEmojis() {
+            missedEmojisDisplay.innerHTML = missedEmojis.map(emoji => `<span style="font-size: 40px;">❌ ${emoji}</span>`).join(' ');
+        }
+
+        holes.forEach(hole => {
+            hole.addEventListener('click', () => {
+                if (hole.textContent === '' || gameOverMessage.style.display === 'block') {
+                    return;
+                }
+
+                if (hole.textContent !== '') {
+                    score++;
+                    scoreDisplay.textContent = score;
+                    hole.textContent = '';
+                }
+            });
+        });
+
+        function endGame() {
+            gameActive = false;
+            gameOverMessage.style.display = 'block';
+            startButton.textContent = "Game Over! Restart";
+            startButton.disabled = false;
+        }
+
+        startButton.addEventListener('click', startGame);
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,212 @@
+.templeContainer {
+    font-family: "Prompt", "Arial", sans-serif;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    text-align: center;
+    max-width: 700px;
+    width: 100%;
+    margin: 80px auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.templeTitle {
+    font-size: 2.5rem;
+    color: #d32f2f;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fortuneContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.lotteryCase {
+    width: 150px;
+    height: 300px;
+    background: linear-gradient(to right, #d7ccc8, #a1887f);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.lotteryCase::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    width: 100%;
+    height: 40px;
+    background: #8b4513;
+    border-radius: 50%;
+}
+
+.lotteryStick {
+    width: 10px;
+    height: 150px;
+    background: #d32f2f;
+    margin: 5px;
+    border-radius: 5px;
+    position: absolute;
+    bottom: 20px;
+    display: none;
+    transition: all 0.5s ease;
+}
+
+.lotteryStick span {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.lotteryStick.selected {
+    display: block;
+    animation: popUp 0.7s ease forwards;
+}
+
+.fortuneResult {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
+}
+
+.customAlert {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.alertBox {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 80%;
+    width: 400px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    transform: scale(0.7);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.alertBox.show {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.alertClose {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+@keyframes shake {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(-10deg);
+    }
+    50% {
+        transform: rotate(10deg);
+    }
+    75% {
+        transform: rotate(-5deg);
+    }
+}
+
+@keyframes popUp {
+    0% {
+        transform: translateY(100%);
+    }
+    70% {
+        transform: translateY(-10%);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes shake {
+    0% {
+        transform: translate(1px, 1px) rotate(0deg);
+    }
+    10% {
+        transform: translate(-1px, -2px) rotate(-1deg);
+    }
+    20% {
+        transform: translate(-3px, 0px) rotate(1deg);
+    }
+    30% {
+        transform: translate(3px, 2px) rotate(0deg);
+    }
+    40% {
+        transform: translate(1px, -1px) rotate(1deg);
+    }
+    50% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+    60% {
+        transform: translate(-3px, 1px) rotate(0deg);
+    }
+    70% {
+        transform: translate(3px, 1px) rotate(-1deg);
+    }
+    80% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+    90% {
+        transform: translate(1px, 2px) rotate(0deg);
+    }
+    100% {
+        transform: translate(1px, -2px) rotate(-1deg);
+    }
+}
+
+.shake {
+    animation: shake 0.5s;
+    animation-iteration-count: 1;
+    }

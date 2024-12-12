@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Wordle Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Slackey&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Slackey', cursive;
+            background-color: #ffefd5;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #227B94;
+            margin-bottom: 20px;
+        }
+
+        #start-screen,
+        #game-screen {
+            display: none;
+        }
+
+        #start-screen.active,
+        #game-screen.active {
+            display: block;
+        }
+
+        #game-container {
+            display: grid;
+            grid-template-rows: repeat(6, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+        }
+
+        .tile {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            line-height: 50px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+        }
+
+        .tile.correct {
+            background-color: #32cd32;
+            color: white;
+        }
+
+        .tile.present {
+            background-color: #ffd700;
+            color: white;
+        }
+
+        .tile.absent {
+            background-color: #ccc;
+            color: white;
+        }
+
+        #keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .key {
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #227B94;
+            color: white;
+            cursor: pointer;
+        }
+
+        .key.small {
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+        }
+
+        .key.large {
+            width: 80px;
+            height: 40px;
+            line-height: 40px;
+        }
+
+        .key:active {
+            background-color: #e52b1f;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #227B94;
+        }
+
+        .alert-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none;
+        }
+
+        .alert-box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            animation: pop-in 0.3s ease-out;
+        }
+
+        .alert-box h2 {
+            color: #ff4500;
+        }
+
+        .alert-box p {
+            margin: 10px 0;
+        }
+
+        .alert-box button {
+            padding: 10px;
+            background-color: #227B94;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .alert-box button:hover {
+            background-color: #e52b1f;
+        }
+
+        @keyframes pop-in {
+            from {
+                transform: scale(0.7);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #78B7D0;
+            border-radius: 10px;
+            background-color: #fff5ee;
+            max-width: 500px;
+        }
+
+        .input-container label {
+            font-size: 1.2rem;
+            font-family: 'Slackey', cursive;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .input-container input {
+            padding: 10px;
+            font-size: 1.2rem;
+            font-family: 'Slackey', cursive;
+            text-align: center;
+            border: 2px solid #78B7D0;
+            border-radius: 5px;
+            outline: none;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .input-container button {
+            padding: 10px;
+            font-size: 1.2rem;
+            font-family: 'Slackey', cursive;
+            background-color: #227B94;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .input-container button:hover {
+            background-color: #165161;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="start-screen" class="active">
+        <div class="input-container">
+            <h1>Doggo Wordle</h1>
+            <label for="player-name">Enter your name:</label>
+            <input type="text" id="player-name" placeholder="Your name here" />
+            <button onclick="startGame()">Start Game</button>
+        </div>
+    </div>
+
+    <div id="game-screen">
+        <h1>Dog Wordle</h1>
+        <div id="game-container"></div>
+        <div id="keyboard">
+            <div class="keyboard-row">
+                <button class="key small" onclick="handleKeyPress('Q')">Q</button>
+                <button class="key small" onclick="handleKeyPress('W')">W</button>
+                <button class="key small" onclick="handleKeyPress('E')">E</button>
+                <button class="key small" onclick="handleKeyPress('R')">R</button>
+                <button class="key small" onclick="handleKeyPress('T')">T</button>
+                <button class="key small" onclick="handleKeyPress('Y')">Y</button>
+                <button class="key small" onclick="handleKeyPress('U')">U</button>
+                <button class="key small" onclick="handleKeyPress('I')">I</button>
+                <button class="key small" onclick="handleKeyPress('O')">O</button>
+                <button class="key small" onclick="handleKeyPress('P')">P</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key small" onclick="handleKeyPress('A')">A</button>
+                <button class="key small" onclick="handleKeyPress('S')">S</button>
+                <button class="key small" onclick="handleKeyPress('D')">D</button>
+                <button class="key small" onclick="handleKeyPress('F')">F</button>
+                <button class="key small" onclick="handleKeyPress('G')">G</button>
+                <button class="key small" onclick="handleKeyPress('H')">H</button>
+                <button class="key small" onclick="handleKeyPress('J')">J</button>
+                <button class="key small" onclick="handleKeyPress('K')">K</button>
+                <button class="key small" onclick="handleKeyPress('L')">L</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key large" onclick="handleKeyPress('DEL')">DEL</button>
+                <button class="key small" onclick="handleKeyPress('Z')">Z</button>
+                <button class="key small" onclick="handleKeyPress('X')">X</button>
+                <button class="key small" onclick="handleKeyPress('C')">C</button>
+                <button class="key small" onclick="handleKeyPress('V')">V</button>
+                <button class="key small" onclick="handleKeyPress('B')">B</button>
+                <button class="key small" onclick="handleKeyPress('N')">N</button>
+                <button class="key small" onclick="handleKeyPress('M')">M</button>
+                <button class="key large" onclick="handleKeyPress('ENTER')">ENTER</button>
+            </div>
+        </div>
+        <div id="message"></div>
+    </div>
+
+    <div class="alert-container" id="alert-container">
+        <div class="alert-box">
+            <h2 id="alert-title"></h2>
+            <p id="alert-message"></p>
+            <button onclick="closeAlert()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        const dogBreeds = ["LABRA", "BULLY", "CORGI", "HUSKY", "AKITA", "SHIBA", "BOXER"];
+        let targetWord = dogBreeds[Math.floor(Math.random() * dogBreeds.length)];
+        const maxGuesses = 6;
+        let currentRow = 0;
+        let currentTile = 0;
+        let gameOver = false;
+        let playerName = '';
+
+        const gameContainer = document.getElementById('game-container');
+        const messageDiv = document.getElementById('message');
+        const alertContainer = document.getElementById('alert-container');
+        const alertTitle = document.getElementById('alert-title');
+        const alertMessage = document.getElementById('alert-message');
+
+        function startGame() {
+            playerName = document.getElementById('player-name').value;
+            if (!playerName.trim()) {
+                alert('Please enter your name!');
+                return;
+            }
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('game-screen').classList.add('active');
+            setupGame();
+        }
+
+        function setupGame() {
+            for (let i = 0; i < maxGuesses; i++) {
+                const row = document.createElement('div');
+                row.classList.add('row');
+                for (let j = 0; j < 5; j++) {
+                    const tile = document.createElement('div');
+                    tile.classList.add('tile');
+                    row.appendChild(tile);
+                }
+                gameContainer.appendChild(row);
+            }
+        }
+
+        function handleKeyPress(key) {
+            if (gameOver) return;
+
+            const rows = document.querySelectorAll('.row');
+            const currentRowEl = rows[currentRow];
+
+            if (key === 'ENTER') {
+                submitGuess(currentRowEl);
+            } else if (key === 'DEL') {
+                deleteLetter(currentRowEl);
+            } else if (/^[A-Z]$/.test(key)) {
+                addLetter(currentRowEl, key);
+            }
+        }
+
+        function addLetter(row, letter) {
+            if (currentTile < 5) {
+                const tile = row.children[currentTile];
+                tile.textContent = letter;
+                currentTile++;
+            }
+        }
+
+        function deleteLetter(row) {
+            if (currentTile > 0) {
+                currentTile--;
+                const tile = row.children[currentTile];
+                tile.textContent = '';
+            }
+        }
+
+        function submitGuess(row) {
+            if (currentTile < 5) {
+                showMessage('Not enough letters!');
+                return;
+            }
+
+            const guess = Array.from(row.children).map(tile => tile.textContent).join('');
+            if (!dogBreeds.includes(guess)) {
+                showMessage('Invalid breed!');
+                return;
+            }
+
+            checkGuess(row, guess);
+
+            if (guess === targetWord) {
+                showAlert('Congratulations!', `You guessed it, ${playerName}!`);
+                gameOver = true;
+                return;
+            }
+
+            if (currentRow === maxGuesses - 1) {
+                showAlert('Game Over', `The word was ${targetWord}. Better luck next time, ${playerName}!`);
+                gameOver = true;
+                return;
+            }
+
+            currentRow++;
+            currentTile = 0;
+        }
+
+        function checkGuess(row, guess) {
+            const guessArray = guess.split('');
+            const targetArray = targetWord.split('');
+
+            guessArray.forEach((letter, index) => {
+                const tile = row.children[index];
+                if (letter === targetArray[index]) {
+                    tile.classList.add('correct');
+                    targetArray[index] = null;
+                } else if (targetArray.includes(letter)) {
+                    tile.classList.add('present');
+                    targetArray[targetArray.indexOf(letter)] = null;
+                } else {
+                    tile.classList.add('absent');
+                }
+            });
+        }
+
+        function showMessage(message) {
+            messageDiv.textContent = message;
+            setTimeout(() => (messageDiv.textContent = ''), 2000);
+        }
+
+        function showAlert(title, message) {
+            alertTitle.textContent = title;
+            alertMessage.textContent = message;
+            alertContainer.style.display = 'flex';
+        }
+
+        function closeAlert() {
+            alertContainer.style.display = 'none';
+            document.getElementById('start-screen').classList.add('active');
+            document.getElementById('game-screen').classList.remove('active');
+            resetGame();
+        }
+
+        function resetGame() {
+            currentRow = 0;
+            currentTile = 0;
+            gameOver = false;
+            targetWord = dogBreeds[Math.floor(Math.random() * dogBreeds.length)];
+            gameContainer.innerHTML = '';
+            setupGame();
+        }
+    </script>
+</body>
+
+</html>

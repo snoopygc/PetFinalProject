@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Matching</title>
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Slackey Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Slackey&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Slackey', cursive;
+            background-color: #F5F4B3;
+            color: #F5F4B3;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .container {
+            background: #859F3D;
+            border: 4px solid #31511E;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #F5F4B3;
+            text-shadow: 2px 2px #31511E;
+            margin-bottom: 20px;
+            font-family: 'Slackey', cursive;
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            font-family: 'Slackey', cursive;
+        }
+
+        #playerName {
+            padding: 10px 15px;
+            font-size: 1rem;
+            font-family: 'Slackey', cursive;
+            border-radius: 15px;
+            border: 2px solid #31511E;
+            outline: none;
+            width: 80%;
+            text-align: center;
+            transition: box-shadow 0.3s;
+        }
+
+        #playerName:focus {
+            box-shadow: 0 0 8px #F5F4B3;
+        }
+
+        #startGameBtn {
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-family: 'Slackey', cursive;
+            color: white;
+            background: linear-gradient(45deg, #F5F4B3, #31511E);
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #startGameBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-info {
+            margin: 20px 0;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #FFFECB;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-family: 'Slackey', cursive;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            background-color: #F5F4B3;
+        }
+
+        .card.flipped {
+            background-color: #31511E;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Animal Matching 👾</h1>
+        <div id="inputSection" class="input-container">
+            <input type="text" id="playerName" placeholder="Enter your name">
+            <button id="startGameBtn">Start Game</button>
+        </div>
+        <div id="gameSection" style="display: none;">
+            <div class="game-info">
+                <p id="scoreBoard">Score: 0</p>
+                <p id="timer">Time left: 60s</p>
+            </div>
+            <div class="game-board" id="gameBoard"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let playerName = '';
+            let score = 0;
+            let timeLeft = 60;
+            let timerInterval;
+            const inputSection = document.getElementById('inputSection');
+            const gameSection = document.getElementById('gameSection');
+            const scoreBoard = document.getElementById('scoreBoard');
+            const timer = document.getElementById('timer');
+            const startGameBtn = document.getElementById('startGameBtn');
+            const gameBoard = document.getElementById('gameBoard');
+            const cardsArray = [
+                { name: 'dog', img: '🐶' }, { name: 'cat', img: '🐱' },
+                { name: 'rabbit', img: '🐰' }, { name: 'hamster', img: '🐹' },
+                { name: 'lion', img: '🦁' }, { name: 'panda', img: '🐼' },
+                { name: 'frog', img: '🐸' }, { name: 'koala', img: '🐨' },
+                { name: 'dog', img: '🐶' }, { name: 'cat', img: '🐱' },
+                { name: 'rabbit', img: '🐰' }, { name: 'hamster', img: '🐹' },
+                { name: 'lion', img: '🦁' }, { name: 'panda', img: '🐼' },
+                { name: 'frog', img: '🐸' }, { name: 'koala', img: '🐨' }
+            ];
+
+            startGameBtn.addEventListener('click', () => {
+                playerName = document.getElementById('playerName').value.trim();
+                if (!playerName) {
+                    Swal.fire({
+                        title: 'Oops!',
+                        text: 'Please enter your name to start the game.',
+                        icon: 'warning',
+                        confirmButtonColor: '#ff4d6d',
+                    });
+                } else {
+                    inputSection.style.display = 'none';
+                    gameSection.style.display = 'block';
+                    startGame();
+                }
+            });
+
+            function startGame() {
+                score = 0;
+                timeLeft = 60;
+                scoreBoard.textContent = `Score: ${score}`;
+                timer.textContent = `Time left: ${timeLeft}s`;
+                gameBoard.innerHTML = '';
+                cardsArray.sort(() => 0.5 - Math.random());
+                createBoard();
+                clearInterval(timerInterval);
+                timerInterval = setInterval(countDown, 1000);
+            }
+
+            function createBoard() {
+                cardsArray.forEach((_, i) => {
+                    const card = document.createElement('div');
+                    card.setAttribute('data-id', i);
+                    card.classList.add('card');
+                    card.addEventListener('click', flipCard);
+                    gameBoard.appendChild(card);
+                });
+            }
+
+            let chosenCards = [];
+            let chosenCardIds = [];
+            let matchedCards = [];
+
+            function flipCard() {
+                const cardId = this.getAttribute('data-id');
+                if (chosenCardIds.includes(cardId) || matchedCards.includes(cardsArray[cardId].name)) return;
+
+                chosenCards.push(cardsArray[cardId].img);
+                chosenCardIds.push(cardId);
+                this.textContent = cardsArray[cardId].img;
+                this.classList.add('flipped');
+
+                if (chosenCards.length === 2) {
+                    setTimeout(checkForMatch, 700);
+                }
+            }
+
+            function checkForMatch() {
+                const cards = document.querySelectorAll('.card');
+                const [firstCardId, secondCardId] = chosenCardIds;
+
+                if (chosenCards[0] === chosenCards[1] && firstCardId !== secondCardId) {
+                    matchedCards.push(cardsArray[firstCardId].name);
+                    cards[firstCardId].style.visibility = 'hidden';
+                    cards[secondCardId].style.visibility = 'hidden';
+                    score += 10;
+                } else {
+                    cards[firstCardId].textContent = '';
+                    cards[secondCardId].textContent = '';
+                    cards[firstCardId].classList.remove('flipped');
+                    cards[secondCardId].classList.remove('flipped');
+                }
+
+                scoreBoard.textContent = `Score: ${score}`;
+                chosenCards = [];
+                chosenCardIds = [];
+
+                if (matchedCards.length === cardsArray.length / 2) {
+                    clearInterval(timerInterval);
+                    Swal.fire({
+                        title: `🎉 Well done, ${playerName}!`,
+                        text: `Your score is ${score}`,
+                        icon: 'success',
+                        confirmButtonColor: '#ff4d6d'
+                    }).then(resetGame);
+                }
+            }
+
+            function countDown() {
+                timeLeft--;
+                timer.textContent = `Time left: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    Swal.fire({
+                        title: `⏳ Time's up, ${playerName}!`,
+                        text: `Your final score is ${score}`,
+                        icon: 'info',
+                        confirmButtonColor: '#ff4d6d',
+                    }).then(resetGame);
+                }
+            }
+
+            function resetGame() {
+                gameSection.style.display = 'none';
+                inputSection.style.display = 'block';
+                document.getElementById('playerName').value = '';
+            }
+        });
+    </script>
+</body>
+</html>

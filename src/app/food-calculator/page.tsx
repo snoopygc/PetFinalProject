@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import PetNameDisplay from '@/components/PetNameDisplay';
+import Cat404 from '@/components/404/cat404';
 
 const FoodCalculator = () => {
     const [isCatSelected, setIsCatSelected] = useState(false);
@@ -132,7 +133,7 @@ const FoodCalculator = () => {
     };
 
     return (
-        <div className="container mx-auto p-6 max-w-4xl">
+        <div className="container mx-auto p-6 max-w-4xl bg-[#fff4d1] min-h-screen">
             <h1 className="text-4xl font-bold text-center mb-4 text-primary">
                 Pet Food Calculator
             </h1>
@@ -155,8 +156,15 @@ const FoodCalculator = () => {
                 </Button>
             </div>
 
-            {errorMessage && (
-                <Card className="mb-8">
+            {errorMessage && isCatSelected && (
+                <Cat404 onGoBack={() => {
+                    setIsCatSelected(false);
+                    setErrorMessage("");
+                }} />
+            )}
+
+            {errorMessage && !isCatSelected && (
+                <Card className="bg-white mb-8">
                     <CardContent className="text-center text-destructive pt-6">
                         <div className="text-6xl font-bold">404</div>
                         <div className="text-xl">{errorMessage}</div>
@@ -166,7 +174,7 @@ const FoodCalculator = () => {
 
             {formVisible && (
                 <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
-                    <Card>
+                    <Card className="bg-white">
                         <CardHeader>
                             <CardTitle>Lifestage</CardTitle>
                         </CardHeader>
@@ -294,10 +302,16 @@ const FoodCalculator = () => {
                             <div>
                                 <label htmlFor="weight" className="block text-sm font-medium text-muted-foreground">Weight (kg):</label>
                                 <Input
-                                    type="number"
+                                    type="text"
                                     id="weight"
                                     value={formData.weight}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                                            handleInputChange(e);
+                                        }
+                                    }}
+                                    pattern="^\d*\.?\d*$"
                                     placeholder="Enter weight in kg"
                                     required
                                 />
@@ -305,7 +319,7 @@ const FoodCalculator = () => {
                         </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="bg-white">
                         <CardHeader>
                             <CardTitle>Lifestyle</CardTitle>
                         </CardHeader>
@@ -360,7 +374,7 @@ const FoodCalculator = () => {
                         </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="bg-white">
                         <CardHeader>
                             <CardTitle>About your dog's food</CardTitle>
                         </CardHeader>
@@ -390,7 +404,7 @@ const FoodCalculator = () => {
                 </form>
             )}
 
-{isModalOpen && solution && (
+            {isModalOpen && solution && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
                     <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
                         <Button 
@@ -404,8 +418,8 @@ const FoodCalculator = () => {
 
                         <PetNameDisplay name={solution.name} />
 
-                        <CardContent className="p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <CardContent className="p-6 mt-20">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
                                 <p><strong>Date of Birth:</strong> {solution.dob}</p>
                                 <p><strong>Age:</strong> {solution.age.years} years, {solution.age.months} months, {solution.age.days} days</p>
                                 <p><strong>Gender:</strong> {solution.gender}</p>
@@ -433,3 +447,4 @@ const FoodCalculator = () => {
 };
 
 export default FoodCalculator;
+
